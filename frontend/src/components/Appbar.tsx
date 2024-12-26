@@ -1,4 +1,4 @@
-import { Link, useParams } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { Avatar } from './BlogCard'
 
 const Appbar = ({shouldPublish}:{shouldPublish:boolean}) => {
