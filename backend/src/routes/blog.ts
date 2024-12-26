@@ -14,7 +14,7 @@ export const blogRouter=new Hono<{
         userId: string; 
     };
   }>();
-
+ 
 
 blogRouter.use('/*',async (c,next)=>{
     //extract the userid
@@ -92,7 +92,22 @@ blogRouter.get('/bulk',async (c) => {
     const prisma=new PrismaClient({
         datasourceUrl:c.env.DATABASE_URL,
     }).$extends(withAccelerate())
-    const blogs=await prisma.blog.findMany();
+    // const authorId=c.get("userId");
+    const blogs=await prisma.blog.findMany({
+        // where:{
+        //     authorId:Number(authorId)
+        // },
+        select:{
+            content:true,
+            title:true,
+            id:true,
+            author:{
+                select:{
+                    name:true
+                }
+            }
+        }
+    });
     return c.json({
         blogs
     })
@@ -107,6 +122,16 @@ blogRouter.get('/:id',async (c) => {
         const blog=await prisma.blog.findFirst({
             where:{
                 id:Number(id),
+            },
+            select:{
+                content:true,
+                title:true,
+                id:true,
+                author:{
+                    select:{
+                        name:true
+                    }
+                }
             }
         })
         return c.json({

@@ -1,13 +1,30 @@
 import { SignupInput } from "@chakbindra/common-medium";
+import axios from "axios";
 import { ChangeEvent, useState } from "react";
-import { Link } from "react-router-dom";
-
+import { Link, useNavigate } from "react-router-dom";
+import {BACKEND_URL} from "../config";
 const Auth = ({type}:{type:"signup" | "signin"}) => {
+  const navigate=useNavigate();
   const [postInputs, setPostInputs] = useState<SignupInput>({
     name: "",
     username: "",
     password: "",
   });
+
+  async function sendRequest(){
+    try{
+      const response=await axios.post(`${BACKEND_URL}/api/v1/user/${type==="signup"?"signup":"signin"}`,postInputs);
+      const jwt=response.data;
+      localStorage.setItem("token",jwt);
+      navigate("/blogs");
+    }catch(e){
+      alert(`error while ${type==='signup'?'signup':'signin'}`);
+    }
+
+  }
+
+
+
   return (
     <div className="h-screen flex justify-center flex-col">
       <div className="flex justify-center">
@@ -24,7 +41,7 @@ const Auth = ({type}:{type:"signup" | "signin"}) => {
           </div>
 
           <div>
-            <LabelledInput
+            {type==="signup"?<LabelledInput
               label="Name"
               placeholder="Indra"
               onChange={(e) => {
@@ -33,14 +50,14 @@ const Auth = ({type}:{type:"signup" | "signin"}) => {
                   name: e.target.value,
                 });
               }}
-            />
+            />:null}
             <LabelledInput
               label="Username"
               placeholder="indra@gmail.com"
               onChange={(e) => {
                 setPostInputs({
                   ...postInputs,
-                  name: e.target.value,
+                  username: e.target.value,
                 });
               }}
             />
@@ -51,12 +68,12 @@ const Auth = ({type}:{type:"signup" | "signin"}) => {
               onChange={(e) => {
                 setPostInputs({
                   ...postInputs,
-                  name: e.target.value,
+                  password: e.target.value,
                 });
               }}
             />
           </div>
-          <button type="button" className="w-full mt-4 text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">{type==="signup"?"Sign Up":"Sign In"}</button>
+          <button onClick={sendRequest}type="button" className="w-full mt-4 text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">{type==="signup"?"Sign Up":"Sign In"}</button>
         </div>
       </div>
       
